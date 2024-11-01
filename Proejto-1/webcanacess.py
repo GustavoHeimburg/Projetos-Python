@@ -1,14 +1,12 @@
 import cv2
+from deepface import DeepFace
 
-# Tente acessar a webcam do DroidCam (0 ou 1 dependendo do dispositivo)
-cap = cv2.VideoCapture(0)  # ou cv2.VideoCapture(1) se necessário
+# Acessa a webcam
+cap = cv2.VideoCapture(0)
 
 if not cap.isOpened():
     print("Erro ao acessar a câmera.")
     exit()
-
-# Carregar o classificador Haar Cascade
-face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
 while True:
     ret, frame = cap.read()
@@ -17,20 +15,25 @@ while True:
         print("Erro ao capturar o frame da câmera.")
         break
 
-    # Converte a imagem para escala de cinza
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    # Analisa o rosto para idade e emoções
+    try:
+        analysis = DeepFace.analyze(frame, actions=['age', 'emotion'], enforce_detection=False)
 
-    # Detecta rostos na imagem
-    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+        # Extrai idade e emoção principal
+        idade = analysis['age']
+        emocao = analysis['dominant_emotion']
 
-    # Desenha um quadrado ao redor de cada rosto detectado
-    for (x, y, w, h) in faces:
-        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        # Adiciona retângulo e texto na imagem
+        cv2.putText(frame, f"Idade: {int(idade)}", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        cv2.putText(frame, f"Emoção: {emocao}", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
-    # Exibe a imagem com os quadrados
-    cv2.imshow('Detecção de Rosto', frame)
+    except Exception as e:
+        print("Erro na análise:", e)
 
-    # Sai do loop ao pressionar a tecla 'q'
+    # Exibe a imagem com os dados
+    cv2.imshow('Análise de Idade e Emoção', frame)
+
+    # Pressione 'q' para sair
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 

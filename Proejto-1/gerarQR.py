@@ -2,7 +2,7 @@ import qrcode
 from PIL import Image
 
 #URL do QRCode
-data = "https://www.seusite.com"
+data = "https://www.instagram.com/santapedraimobiliaria/"
 
 # Criando o QR Code
 qr = qrcode.QRCode(
