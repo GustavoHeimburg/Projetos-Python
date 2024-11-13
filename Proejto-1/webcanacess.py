@@ -15,18 +15,14 @@ while True:
         print("Erro ao capturar o frame da câmera.")
         break
 
-    # Analisa o rosto para idade e emoções
     try:
-        # Enforce detection set to False para evitar erro em caso de falha na detecção
+
         analysis = DeepFace.analyze(frame, actions=['age', 'emotion'], enforce_detection=False)
 
-        # Verifica se analysis contém as chaves 'age' e 'dominant_emotion'
         if isinstance(analysis, dict) and 'age' in analysis and 'dominant_emotion' in analysis:
-            # Extrai idade e emoção principal
             idade = analysis['age']
             emocao = analysis['dominant_emotion']
 
-            # Adiciona retângulo e texto na imagem
             cv2.putText(frame, f"Idade: {int(idade)}", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
             cv2.putText(frame, f"Emoção: {emocao}", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         else:
